@@ -1,0 +1,23 @@
+[tool.poetry]
+name = "edusocrates-rag"
+version = "0.1.0"
+description = "EduSocrates-RAG: LoRA-fine-tuned LLM + RAG for Socratic Q&A"
+authors = ["Your Name <you@example.com>"]
+
+[tool.poetry.dependencies]
+python = "^3.10"
+torch = "^2.0"
+peft = "^0.5"
+transformers = "^4.35"
+faiss-cpu = "*"
+sentence-transformers = "*"
+streamlit = "*"
+pypdf = "*"
+typer = "*"
+
+[tool.poetry.dev-dependencies]
+pytest = "*"
+
+[build-system]
+requires = ["poetry-core"]
+build-backend = "poetry.core.masonry.api"

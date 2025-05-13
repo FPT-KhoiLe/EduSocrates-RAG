@@ -1,0 +1,9 @@
+torch
+peft
+transformers
+faiss-cpu
+sentence-transformers
+streamlit
+pypdf
+typer
+pytest
