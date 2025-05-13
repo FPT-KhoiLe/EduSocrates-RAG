@@ -1,0 +1,39 @@
+# Byte-compiled / optimized
+__pycache__/
+*.py[cod]
+*$py.class
+
+# Virtual envs
+env/
+venv/
+.venv/
+
+# Jupyter
+.ipynb_checkpoints
+*.ipynb
+
+# PyTorch / Lightning logs, checkpoints
+*.ckpt
+/lightning_logs/
+
+# FAISS index, embeddings
+*.faiss
+*.npy
+*.sqlite
+
+# Docker
+docker-compose.override.yml
+
+# VSCode
+.vscode/
+
+# Mac
+.DS_Store
+
+# Logs
+*.log
+
+# Distribution
+build/
+dist/
+*.egg-info/
