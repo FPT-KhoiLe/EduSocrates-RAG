@@ -37,3 +37,7 @@ docker-compose.override.yml
 build/
 dist/
 *.egg-info/
+
+
+#Datas
+PDFs
