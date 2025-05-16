@@ -1,23 +1,17 @@
-[tool.poetry]
-name = "edusocrates-rag"
-version = "0.1.0"
-description = "EduSocrates-RAG: LoRA-fine-tuned LLM + RAG for Socratic Q&A"
-authors = ["Your Name <you@example.com>"]
-
-[tool.poetry.dependencies]
-python = "^3.10"
-torch = "^2.0"
-peft = "^0.5"
-transformers = "^4.35"
-faiss-cpu = "*"
-sentence-transformers = "*"
-streamlit = "*"
-pypdf = "*"
-typer = "*"
-
-[tool.poetry.dev-dependencies]
-pytest = "*"
-
 [build-system]
-requires = ["poetry-core"]
-build-backend = "poetry.core.masonry.api"
+requires=["setuptools>=68"] # Must have: Danh sách gói dùng để dựng package.
+build-backend = "setuptools.build_meta" # Must have: Trình biên dịch package, thuộc setuptools
+
+[project]
+name = "edusocrates_rag"
+version = "0.0.1"
+description = "EduSocrates-RAG: LoRA-fine-tuned LLM + RAG for Socratic Q&A"
+requires-python = ">=3.11"
+authors = [
+    {name = "Khoi Le", email = "khoile54642005@gmail.com"}
+]
+
+[tool.setuptools.packages.find]
+where = ["src"]
+
+#[project.scripts]

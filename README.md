@@ -15,6 +15,15 @@ Xây dựng trợ lý học tập AI chạy offline, cho phép sinh viên:
 - Viết `requirements.txt`  
 - Viết test đơn giản đảm bảo import module `ingest.py`  
 
+## Scope tuần 2
+- Viết hàm `parse_pdf` cho `ingest.py`, `pytest` `test_ingest.py` pass xanh.
+- `parse_pdf` trả về cấu trúc dạng:
+  - List record
+    {doc: str,
+    chapter: Optional[str],
+    page: int,
+    text: str}
+- Viết hàm `split_sentences(text)`, `make_chunks` để lấy chunks và kết hợp vào pipeline.
 ## Tech Stack
 
 | Layer       | Thư viện                  |

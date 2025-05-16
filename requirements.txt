@@ -4,6 +4,7 @@ transformers
 faiss-cpu
 sentence-transformers
 streamlit
-pypdf
+pypdf~=5.5.0
 typer
 pytest
+reportlab
