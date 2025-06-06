@@ -1,21 +1,20 @@
 # tests/test_ingest.py
 import pytest
+from edusocrates_rag.data_ingest.ingest import *
 
 def test_ingest_importable():
     """
     Đảm bảo import được module và class/function placeholder không lỗi.
     """
     try:
-        import edusocrates_rag.ingest as ingest
+        import edusocrates_rag.data_ingest.ingest as ingest
     except ImportError as e:
         pytest.skip(f"Module ingest chưa hoàn thiện: {e}")
     # Placeholder: ingest.py đã có function chunk_pdf?
     assert hasattr(ingest, "parse_pdf"), "Bạn hãy định nghĩa function parse_pdf()"
 
-
-
 def test_parse_pdf_minimal(tmp_path):
-    from edusocrates_rag.ingest import parse_pdf
+    from edusocrates_rag.data_ingest.ingest import parse_pdf
 
     # Use fake PDF with 1 page, "Hello World" content
     from reportlab.pdfgen import canvas
@@ -34,3 +33,8 @@ def test_parse_pdf_minimal(tmp_path):
     assert rec["chapter"] is None, "chapter must be None if not in outline"
     assert rec["page"] == 1, "page must be 1"
     assert rec["text"] == "Hello World\n", "text must be the page content"
+
+def test_split_sentences_basic():
+    text = "Hello world. This is test!"
+    s = split_sentences(text)
+    assert s == ["Hello world.", "This is test!"]
