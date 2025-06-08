@@ -1,65 +1,70 @@
-from typing import List, Tuple
-import numpy as np
+# src/edusocrates_rag/data_ingest/vector_store.py
+"""
+Build / update a FAISS index from chunks produced
+by ingest.py  ──>  <kb>/faiss.index  +  <kb>/chunks.json
+"""
+
+from __future__ import annotations
+import json
+from pathlib import Path
+from typing import List, Dict
+
+import faiss                   # pip install faiss-cpu
 from sentence_transformers import SentenceTransformer
-import faiss
-import torch
 
-def embed_chunks(
-        chunks: List[str],
-        model_name: str = "intfloat/e5-large-v2"
-) -> torch.Tensor:
-    """
-    Encode list of text chunks thành một ma trận embedding.
-    Input:
-        - chunks: List[str], each element <= vài trăm token
-        - model_name: HF repo name cho SentenceTransformer
-    Output:
-        - embs: np.ndarray shape = (len(chunks), dim)
-    """
+# ─────────────────────────────────────────────── globals
+_EMBED_MODEL = SentenceTransformer("sentence-transformers/all-MiniLM-L6-v2")
+_DIM = _EMBED_MODEL.get_sentence_embedding_dimension()
 
-    model = SentenceTransformer(model_name)
-    embs = model.encode(
-        chunks,
-        convert_to_tensor=True,
-        show_progress_bar=False,
-        normalize_embeddings=True,
-    )
-    return embs
 
-def build_faiss_index(
-        embs: np.ndarray
-) -> faiss.Index:
+# ─────────────────────────────────────────────── api
+def build_index(
+    chunks: List[Dict],
+    kb_path: Path,
+    index_name: str = "faiss.index",
+) -> None:
     """
-    Khởi tạo FAISS Index để tìm kNN theo cosine similarity.
-    Input:
-        - embs: np.ndarray shape = (N, dim), đã L2-normalize
-    Output:
-        - index: FAISS IndexFlatIP với tất cả vectors đã thêm
+    chunks  : list returned by data_ingest.ingest.ingest_file()
+    kb_path : path to knowledge-base folder (…/knowledge/<KB>)
     """
-    N, dim = embs.shape
-    index = faiss.IndexFlatIP(dim)
-    index.add(embs)
-    return index
+    kb_path.mkdir(parents=True, exist_ok=True)
+    vecs = _EMBED_MODEL.encode([c["text"] for c in chunks]).astype("float32")
 
-def retrieve_top_k(
-        index: faiss.Index,
-        query_embs: np.ndarray,
-        chunks: List[str],
-        k: int = 5
-) -> List[Tuple[str, float]]:
-    """
-    Tìm top-k chunks tương tự nhất với query embedding.
-    Input:
-        - index: FAISS Index built từ embed_chunks
-        - query_embs: np.ndarray shape = (1, dim), normalized
-        - chunks : List[str], nội dung tương ứng với index
-        - k: số lượng trả về
-    Output:
-        - List of (chunk_text, similarity_score)
-    """
-    D, I = index.search(query_embs, k)
+    index = faiss.IndexFlatIP(_DIM)
+    index.add(vecs)  # type: ignore[arg-type]
+
+    # save index
+    faiss.write_index(index, str(kb_path / index_name))
+
+    # also persist metadata so we can map id → chunk
+    with open(kb_path / "chunks.json", "w", encoding="utf-8") as f:
+        json.dump(chunks, f, ensure_ascii=False, indent=2)
+
+    print(f"💾💥 Saved {len(chunks)} vectors → {kb_path / index_name}")
+
+
+def load_index(kb_path: Path, index_name: str = "faiss.index"):
+    """Return (faiss_index, chunks_metadata_list)."""
+    index = faiss.read_index(str(kb_path / index_name))
+    with open(kb_path / "chunks.json", encoding="utf-8") as f:
+        meta = json.load(f)
+    return index, meta
+
+
+def search(
+    question: str,
+    kb_path: Path,
+    top_k: int = 5,
+) -> List[Dict]:
+    """Return top-k chunk dicts with extra 'score' field."""
+    index, meta = load_index(kb_path)
+    q_vec = _EMBED_MODEL.encode([question]).astype("float32")
+    scores, ids = index.search(q_vec, top_k)
     results = []
-    for idx, score in zip(I[0], D[0]):
-        results.append((chunks[idx], score))
+    for score, idx in zip(scores[0], ids[0]):
+        if idx == -1:
+            continue
+        c = meta[idx].copy()
+        c["score"] = float(score)
+        results.append(c)
     return results
-
