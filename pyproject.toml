@@ -14,4 +14,5 @@ authors = [
 [tool.setuptools.packages.find]
 where = ["src"]
 
-#[project.scripts]
+[project.scripts]
+esrag = "edusocrates_rag.cli:main"
