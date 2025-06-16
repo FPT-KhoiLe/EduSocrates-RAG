@@ -35,7 +35,7 @@ def main():
     # dump text chunks line-by-line for WebUI
     kb_path.mkdir(parents=True, exist_ok=True)
     out_txt = kb_path / "chunks.txt"
-    with open(out_txt, "w") as f:
+    with open(out_txt, "w", encoding="utf-8") as f:
         for chunk in all_chunks:
             f.write(chunk["text"] + "\n")
 

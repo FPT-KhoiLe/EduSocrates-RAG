@@ -10,3 +10,5 @@ pytest~=8.3.5
 reportlab
 nltk~=3.9.1
 setuptools~=78.1.1
+fastapi
+uvicorn
